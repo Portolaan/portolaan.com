@@ -1,0 +1,50 @@
+/* Lens: Portolaan's liquid-glass material. One material, three densities.
+   .lens          chrome and floating controls (header, buttons, chips)
+   .lens.lens-panel   content panels over the chart backdrop
+   .lens.lens-strong  surfaces whose job is to be read (dialogs, dense text)
+   Guards: no backdrop-filter -> solid; prefers-reduced-transparency -> solid.
+   No SVG refraction filter: support is uneven and it costs paint time; the rim
+   light, sheen and saturation carry the liquid effect instead. */
+
+.lens{
+  position:relative;
+  isolation:isolate;
+  background:var(--bg-2);
+  border:1px solid var(--rule);
+  border-radius:var(--r-2);
+  box-shadow:var(--glass-shadow);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .lens{
+    background:var(--glass-tint);
+    -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+            backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+    border:1px solid var(--glass-edge-low);
+    box-shadow:
+      inset 0 1px 0 var(--glass-hi),          /* top rim: the light catches the edge */
+      inset 0 -1px 0 var(--glass-edge-low),    /* bottom rim, darker */
+      inset 0 0 0 1px var(--glass-edge-low),
+      inset 0 18px 36px -24px oklch(1 0 0 / 0.10),  /* thickness: light pooling under the top edge */
+      inset 0 -18px 36px -28px oklch(0 0 0 / 0.25), /* thickness: shade at the bottom edge */
+      var(--glass-shadow);
+  }
+  /* specular sheen: a soft diagonal highlight, like light across a curved surface */
+  .lens::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+    background:var(--glass-sheen);
+    mix-blend-mode:screen;
+  }
+  /* edge light: brighter rim fading round the shape */
+  .lens::after{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    padding:1px;
+    background:linear-gradient(160deg, var(--glass-edge) 0%, transparent 35%, transparent 65%, var(--glass-edge-low) 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+  .lens-strong{ background:var(--glass-tint-strong); }
+}
+@media (prefers-reduced-transparency: reduce){
+  .lens,.lens-strong{ background:var(--bg-2) !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  .lens::before{ display:none; }
+}

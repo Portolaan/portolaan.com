@@ -1,0 +1,122 @@
+/* Portolaan design tokens: the single source for colour, type, space, radius,
+   glass and motion. See ../DESIGN.md for the rationale. Dark ("Deep water") is
+   the default; [data-theme="light"] and prefers-color-scheme: light give
+   "Vellum". Colours are oklch for perceptual consistency across themes. */
+
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('../fonts/Inter.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/IBMPlexMono-400.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/IBMPlexMono-500.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/IBMPlexMono-600.woff2') format('woff2')}
+
+:root{
+  /* Deep water (default) */
+  --bg:        oklch(0.165 0.016 255);
+  --bg-2:      oklch(0.205 0.016 255);
+  --bg-3:      oklch(0.25  0.016 225);
+  --ink:       oklch(0.955 0.008 85);
+  --ink-2:     oklch(0.80  0.010 85);
+  --ink-3:     oklch(0.62  0.012 220);
+  --ink-4:     oklch(0.46  0.012 220);
+  --rule:      oklch(1 0 0 / 0.10);
+  --rule-2:    oklch(1 0 0 / 0.06);
+
+  /* One accent: Chart navy (dark theme uses a lighter navy so it reads on Deep water). One signal, used once per view at most: Rhumb vermilion. */
+  --accent:      oklch(0.76 0.085 258);
+  --accent-deep: oklch(0.38 0.110 262);
+  --accent-ink:  oklch(0.16 0.02 255);
+  --accent-soft: oklch(0.76 0.085 258 / 0.14);
+  --rhumb:       oklch(0.66 0.15 35);
+
+  /* Chart motif (rhumb lines, roses) */
+  --chart-line:  oklch(0.82 0.04 255 / 0.17);
+  --chart-line-2:oklch(0.80 0.03 255 / 0.05);
+
+  /* Type */
+  --font-sans: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --fs-display: clamp(2.6rem, 6.2vw, 5.2rem);
+  --fs-h2:      clamp(1.8rem, 3.2vw, 2.6rem);
+  --fs-h3:      1.2rem;
+  --fs-lead:    clamp(1.08rem, 1.5vw, 1.3rem);
+  --fs-body:    1rem;
+  --fs-label:   0.75rem;
+  --track-display: -0.03em;
+  --track-h2:      -0.02em;
+  --track-label:   0.18em;
+
+  /* Space (8-pt) and shape */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 72px; --s-9: 112px;
+  --r-1: 8px;  --r-2: 14px; --r-3: 22px; --r-pill: 999px;
+  --max: 1200px;
+
+  /* Liquid glass ("Lens"): thick, bright-edged, refracting glass for chrome and key panels */
+  --glass-tint:     oklch(0.32 0.03 255 / 0.30);
+  --glass-tint-strong: oklch(0.20 0.02 255 / 0.72);
+  --glass-blur:     7px;
+  --glass-sat:      1.9;
+  --glass-edge:     oklch(1 0 0 / 0.30);
+  --glass-edge-low: oklch(1 0 0 / 0.06);
+  --glass-hi:       oklch(1 0 0 / 0.45);   /* top specular rim */
+  --glass-sheen:    linear-gradient(135deg, oklch(1 0 0 / 0.18) 0%, oklch(1 0 0 / 0.04) 36%, oklch(1 0 0 / 0) 58%, oklch(1 0 0 / 0.07) 100%);
+  --glass-shadow:   0 1px 1px oklch(0 0 0 / 0.20), 0 12px 40px oklch(0 0 0 / 0.35);
+
+  /* Motion */
+  --t-fast: 140ms; --t-base: 220ms; --t-slow: 420ms;
+  --ease: cubic-bezier(.22,1,.36,1);
+
+  color-scheme: dark;
+}
+
+/* Vellum (light) */
+:root[data-theme="light"]{
+  --bg:        oklch(0.975 0.010 85);
+  --bg-2:      oklch(0.955 0.012 85);
+  --bg-3:      oklch(0.925 0.014 85);
+  --ink:       oklch(0.20 0.020 255);
+  --ink-2:     oklch(0.36 0.018 255);
+  --ink-3:     oklch(0.50 0.014 255);
+  --ink-4:     oklch(0.64 0.010 255);
+  --rule:      oklch(0.20 0.02 255 / 0.12);
+  --rule-2:    oklch(0.20 0.02 255 / 0.07);
+  --accent:      oklch(0.36 0.115 262);
+  --accent-deep: oklch(0.30 0.100 262);
+  --accent-ink:  oklch(0.98 0.01 85);
+  --accent-soft: oklch(0.36 0.115 262 / 0.10);
+  --chart-line:  oklch(0.30 0.04 255 / 0.13);
+  --chart-line-2:oklch(0.30 0.04 255 / 0.06);
+  --glass-tint:     oklch(1 0 0 / 0.38);
+  --glass-tint-strong: oklch(0.99 0.006 85 / 0.82);
+  --glass-edge:     oklch(1 0 0 / 0.75);
+  --glass-edge-low: oklch(0.20 0.02 255 / 0.08);
+  --glass-hi:       oklch(1 0 0 / 0.95);
+  --glass-sheen:    linear-gradient(135deg, oklch(1 0 0 / 0.55) 0%, oklch(1 0 0 / 0.10) 40%, oklch(1 0 0 / 0) 62%, oklch(1 0 0 / 0.20) 100%);
+  --glass-shadow:   0 1px 1px oklch(0.20 0.02 255 / 0.06), 0 14px 40px oklch(0.20 0.02 255 / 0.12);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:        oklch(0.975 0.010 85);
+    --bg-2:      oklch(0.955 0.012 85);
+    --bg-3:      oklch(0.925 0.014 85);
+    --ink:       oklch(0.20 0.020 255);
+    --ink-2:     oklch(0.36 0.018 255);
+    --ink-3:     oklch(0.50 0.014 255);
+    --ink-4:     oklch(0.64 0.010 255);
+    --rule:      oklch(0.20 0.02 255 / 0.12);
+    --rule-2:    oklch(0.20 0.02 255 / 0.07);
+    --accent:      oklch(0.36 0.115 262);
+    --accent-deep: oklch(0.30 0.100 262);
+    --accent-ink:  oklch(0.98 0.01 85);
+    --accent-soft: oklch(0.36 0.115 262 / 0.10);
+    --chart-line:  oklch(0.30 0.04 255 / 0.13);
+    --chart-line-2:oklch(0.30 0.04 255 / 0.06);
+    --glass-tint:     oklch(1 0 0 / 0.38);
+    --glass-tint-strong: oklch(0.99 0.006 85 / 0.82);
+    --glass-edge:     oklch(1 0 0 / 0.75);
+    --glass-edge-low: oklch(0.20 0.02 255 / 0.08);
+    --glass-hi:       oklch(1 0 0 / 0.95);
+    --glass-sheen:    linear-gradient(135deg, oklch(1 0 0 / 0.55) 0%, oklch(1 0 0 / 0.10) 40%, oklch(1 0 0 / 0) 62%, oklch(1 0 0 / 0.20) 100%);
+    --glass-shadow:   0 1px 1px oklch(0.20 0.02 255 / 0.06), 0 14px 40px oklch(0.20 0.02 255 / 0.12);
+    color-scheme: light;
+  }
+}

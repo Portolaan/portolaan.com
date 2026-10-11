@@ -38,8 +38,11 @@
     content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
     background:
       radial-gradient(circle 190px at var(--mx) var(--my), color-mix(in oklch, var(--glass-spec) calc(var(--spec) * 100%), transparent) 0, transparent 100%),
+      radial-gradient(circle 440px at var(--mx) var(--my), transparent 8%, color-mix(in oklch, var(--glass-shade) calc(var(--spec) * 100%), transparent) 100%),
       var(--glass-sheen);
-    mix-blend-mode:screen;
+    /* normal, not screen: identical for the white layers, and lets the shade darken
+       the far side, which is what makes the light readable on pale Vellum glass */
+    mix-blend-mode:normal;
     transition:--spec .32s var(--ease);
   }
   /* edge light: brighter rim fading round the shape */

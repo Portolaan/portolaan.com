@@ -59,6 +59,7 @@
   --glass-hi:       oklch(1 0 0 / 0.45);   /* top specular rim */
   --glass-sheen:    linear-gradient(135deg, oklch(1 0 0 / 0.18) 0%, oklch(1 0 0 / 0.04) 36%, oklch(1 0 0 / 0) 58%, oklch(1 0 0 / 0.07) 100%);
   --glass-spec:     oklch(1 0 0 / 0.20);   /* pointer light (glass.css) */
+  --glass-shade:    oklch(0 0 0 / 0);      /* far-side shade under the pointer light; none on Deep water */
   --glass-shadow:   0 1px 1px oklch(0 0 0 / 0.20), 0 12px 40px oklch(0 0 0 / 0.35);
 
   /* Motion */
@@ -91,7 +92,8 @@
   --glass-edge-low: oklch(0.20 0.02 255 / 0.08);
   --glass-hi:       oklch(1 0 0 / 0.95);
   --glass-sheen:    linear-gradient(135deg, oklch(1 0 0 / 0.55) 0%, oklch(1 0 0 / 0.10) 40%, oklch(1 0 0 / 0) 62%, oklch(1 0 0 / 0.20) 100%);
-  --glass-spec:     oklch(1 0 0 / 0.90);   /* pointer light (glass.css) */
+  --glass-spec:     oklch(1 0 0 / 1);      /* pointer light (glass.css) */
+  --glass-shade:    oklch(0.30 0.04 255 / 0.16);   /* far-side shade: gives the light contrast on Vellum */
   --glass-shadow:   0 1px 1px oklch(0.20 0.02 255 / 0.06), 0 14px 40px oklch(0.20 0.02 255 / 0.12);
   color-scheme: light;
 }
@@ -118,7 +120,8 @@
     --glass-edge-low: oklch(0.20 0.02 255 / 0.08);
     --glass-hi:       oklch(1 0 0 / 0.95);
     --glass-sheen:    linear-gradient(135deg, oklch(1 0 0 / 0.55) 0%, oklch(1 0 0 / 0.10) 40%, oklch(1 0 0 / 0) 62%, oklch(1 0 0 / 0.20) 100%);
-    --glass-spec:     oklch(1 0 0 / 0.90);   /* pointer light (glass.css) */
+    --glass-spec:     oklch(1 0 0 / 1);      /* pointer light (glass.css) */
+    --glass-shade:    oklch(0.30 0.04 255 / 0.16);   /* far-side shade: gives the light contrast on Vellum */
     --glass-shadow:   0 1px 1px oklch(0.20 0.02 255 / 0.06), 0 14px 40px oklch(0.20 0.02 255 / 0.12);
     color-scheme: light;
   }

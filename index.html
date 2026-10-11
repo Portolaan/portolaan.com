@@ -243,6 +243,45 @@ details p{color:var(--ink-2);margin:var(--s-3) 0 0;max-width:70ch}
 @media (max-width:900px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}}
 @media (max-width:560px){.site-foot{padding:var(--s-6) var(--s-5) var(--s-4)}}
 
+/* Interaction layer (11 Oct 2026): responds to the visitor's hand; the backdrop loop stays the only unprompted motion */
+/* Reading position: the section's index rule fills in navy as you read; the nav marks where you are */
+.idx{position:relative}
+.idx::after{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--accent);transform-origin:0 50%;transform:scaleX(var(--read,0))}
+nav a[aria-current]{color:var(--accent);background:var(--rule-2)}
+/* Taking a bearing: a tap on open chart draws a rhumb from the nearest rose, with its bearing */
+.bearing{color:var(--accent);pointer-events:none}
+.bearing line{stroke:currentColor;stroke-width:1;stroke-dasharray:1;stroke-dashoffset:1;animation:bearing-draw .7s var(--ease) forwards,bearing-fade 3.2s linear forwards}
+.bearing .ring{fill:none;stroke:currentColor;stroke-width:1.2;transform-box:fill-box;transform-origin:center;animation:beacon 1.8s ease-out .45s both}
+.bearing .dot{fill:currentColor;animation:bearing-fade 3.2s linear forwards}
+.bearing text{fill:currentColor;font:500 10px var(--font-mono);letter-spacing:.08em;animation:bearing-fade 3.2s linear forwards}
+@keyframes bearing-draw{to{stroke-dashoffset:0}}
+@keyframes bearing-fade{0%,55%{opacity:.85}100%{opacity:0}}
+/* Touch: a short press on what can be pressed; hover lifts only where hover exists */
+a,button,summary{-webkit-tap-highlight-color:transparent}
+summary,nav a,.foot-col a,.foot-base a{transition:color var(--t-fast) var(--ease),background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.proof a:active,.post:not(.post-soon):active,summary:active,nav a:active,.foot-col a:active,.foot-base a:active{transform:scale(.98)}
+@media (hover:none){
+  .btn-solid:hover:not(:active),.proof a:hover:not(:active),.post:not(.post-soon):hover:not(:active){transform:none}
+  .btn:hover .arr{transform:none}
+}
+/* Theme switch: the new theme spreads from the button (View Transitions; instant elsewhere) */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+/* FAQ opens smoothly (height where ::details-content exists, a soft rise everywhere) */
+details{interpolate-size:allow-keywords}
+details::details-content{block-size:0;overflow:clip;transition:block-size var(--t-slow) var(--ease),content-visibility var(--t-slow) allow-discrete}
+details[open]::details-content{block-size:auto}
+details[open] p{animation:faq-in var(--t-slow) var(--ease)}
+@keyframes faq-in{from{opacity:0;transform:translateY(-4px)}}
+/* The headline's navy word is underlined once, on arrival */
+h1 em{background:linear-gradient(currentColor,currentColor) 0 96%/0% .05em no-repeat;transition:background-size .9s var(--ease) .55s}
+h1.in em{background-size:100% .05em}
+@media (prefers-reduced-motion: reduce){
+  h1 em{background-size:100% .05em;transition:none}
+  .bearing{display:none}
+  details::details-content{transition:none}
+  details[open] p{animation:none}
+}
+
 /* Reveal on scroll */
 .rv{opacity:0;transform:translateY(14px);transition:opacity var(--t-slow) var(--ease),transform var(--t-slow) var(--ease)}
 .rv.in{opacity:1;transform:none}
@@ -573,17 +612,87 @@ details p{color:var(--ink-2);margin:var(--s-3) 0 0;max-width:70ch}
   });
 })();
 (function(){
-  /* Theme switch: flips between Deep water and Vellum and remembers the choice */
+  /* Theme switch: flips between Deep water and Vellum and remembers the choice.
+     Where View Transitions exist, the new theme spreads out from the button like ink. */
   const btn=document.getElementById('theme'), root=document.documentElement;
+  const still=matchMedia('(prefers-reduced-motion: reduce)');
   btn.addEventListener('click',()=>{
     const cur=root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
     const next=cur==='light'?'dark':'light';
-    root.setAttribute('data-theme',next);
-    try{localStorage.setItem('portolaan-theme',next);}catch(e){}
+    const flip=()=>{root.setAttribute('data-theme',next);try{localStorage.setItem('portolaan-theme',next);}catch(e){}};
+    if(!document.startViewTransition||still.matches){flip();return}
+    const r=btn.getBoundingClientRect(), x=r.left+r.width/2, y=r.top+r.height/2;
+    const end=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+    document.startViewTransition(flip).ready.then(()=>root.animate(
+      {clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${end}px at ${x}px ${y}px)`]},
+      {duration:560,easing:'cubic-bezier(.22,1,.36,1)',pseudoElement:'::view-transition-new(root)'}));
   });
-  /* Reveal on scroll */
-  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
+  /* Reveal on scroll; elements that arrive together follow one another */
+  const io=new IntersectionObserver(es=>{let k=0;es.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target;
+    if(k){el.style.transitionDelay=Math.min(k,4)*80+'ms';el.addEventListener('transitionend',()=>{el.style.transitionDelay=''},{once:true})}
+    k++;el.classList.add('in');io.unobserve(el);
+  })},{rootMargin:'0px 0px -8% 0px'});
   document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+})();
+</script>
+<script>
+/* Interaction layer: light on the glass, taking a bearing, reading position */
+(function(){
+  const still=matchMedia('(prefers-reduced-motion: reduce)');
+  document.addEventListener('touchstart',()=>{},{passive:true}); /* lets iOS apply :active press states */
+
+  /* Light on the glass: follows the mouse, or blooms under the finger while it presses */
+  let lit=null, raf=0, px=0, py=0;
+  const place=()=>{raf=0;if(!lit)return;const r=lit.getBoundingClientRect();
+    lit.style.setProperty('--mx',((px-r.left)/r.width*100).toFixed(1)+'%');
+    lit.style.setProperty('--my',((py-r.top)/r.height*100).toFixed(1)+'%');};
+  const light=el=>{if(lit===el)return;if(lit)lit.style.setProperty('--spec','0');lit=el;if(lit){place();lit.style.setProperty('--spec','1')}};
+  const lensAt=t=>t&&t.closest?t.closest('.lens'):null;
+  document.addEventListener('pointermove',e=>{
+    if(e.pointerType!=='mouse')return;
+    px=e.clientX;py=e.clientY;light(lensAt(e.target));if(lit&&!raf)raf=requestAnimationFrame(place);
+  },{passive:true});
+  document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;px=e.clientX;py=e.clientY;light(lensAt(e.target))},{passive:true});
+  const lift=e=>{if(e.pointerType!=='mouse')light(null)};
+  document.addEventListener('pointerup',lift,{passive:true});
+  document.addEventListener('pointercancel',lift,{passive:true});
+  document.addEventListener('pointerout',e=>{if(!e.relatedTarget)light(null)},{passive:true});
+
+  /* Taking a bearing: tap or click open chart (not text, links or panels) */
+  const drift=document.querySelector('.chart-bg .drift'), NS='http://www.w3.org/2000/svg';
+  const ROSES=[[262,400],[1150,168]];           /* design-assets/make_plates.py */
+  const SKIP='a,button,input,textarea,select,label,summary,details,.lens,p,h1,h2,h3,h4,li,dd,dt,blockquote,figure,footer,header';
+  let live=0;
+  document.addEventListener('click',e=>{
+    if(still.matches||!drift||live>=4||e.target.closest(SKIP))return;
+    const sel=getSelection();if(sel&&!sel.isCollapsed)return;
+    const m=drift.getScreenCTM();if(!m)return;
+    const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse());
+    const d=r=>Math.hypot(r[0]-p.x,r[1]-p.y), [rx,ry]=ROSES.reduce((a,b)=>d(b)<d(a)?b:a);
+    const deg=Math.round((Math.atan2(p.x-rx,ry-p.y)*180/Math.PI+360)%360)%360;
+    const x=p.x.toFixed(1), y=p.y.toFixed(1), g=document.createElementNS(NS,'g');
+    g.setAttribute('class','bearing');
+    g.innerHTML=`<line x1="${rx}" y1="${ry}" x2="${x}" y2="${y}" pathLength="1"/><circle class="ring" cx="${x}" cy="${y}" r="10"/><circle class="dot" cx="${x}" cy="${y}" r="2.2"/><text x="${(p.x+8).toFixed(1)}" y="${(p.y-8).toFixed(1)}">${String(deg).padStart(3,'0')}°</text>`;
+    drift.appendChild(g);live++;
+    setTimeout(()=>{g.remove();live--},3300);
+  });
+
+  /* Reading position: fill each section's index rule, mark the current section in the nav */
+  const NAV={services:'services',sample:'services',method:'method',proof:'method',perspectives:'perspectives',principles:'about',about:'about'};
+  const links={};document.querySelectorAll('nav a[href^="#"]').forEach(a=>{links[a.getAttribute('href').slice(1)]=a});
+  const secs=[...document.querySelectorAll('main section[id]')].map(s=>({s,idx:s.querySelector('.idx'),p:-1}));
+  let cur, tick=0;
+  const read=()=>{tick=0;const line=innerHeight*.38;let now=null;
+    for(const o of secs){const r=o.s.getBoundingClientRect();
+      if(o.idx){const p=Math.round(Math.min(1,Math.max(0,(line-r.top)/r.height))*200)/200;
+        if(p!==o.p){o.p=p;o.idx.style.setProperty('--read',p)}}
+      if(r.top<=line&&r.bottom>line)now=o.s.id;}
+    if(now!==cur){cur=now;for(const a of Object.values(links))a.removeAttribute('aria-current');
+      const a=links[NAV[now]];if(a)a.setAttribute('aria-current','true');}};
+  addEventListener('scroll',()=>{if(!tick)tick=requestAnimationFrame(read)},{passive:true});
+  addEventListener('resize',read);read();
 })();
 </script>
 </body>

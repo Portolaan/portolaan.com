@@ -6,6 +6,10 @@
    No SVG refraction filter: support is uneven and it costs paint time; the rim
    light, sheen and saturation carry the liquid effect instead. */
 
+/* Pointer light: --spec (0..1) and --mx/--my are set per panel by the page script,
+   so the highlight sits where the cursor or finger is and fades in and out. */
+@property --spec{syntax:'<number>';inherits:true;initial-value:0}
+
 .lens{
   position:relative;
   isolation:isolate;
@@ -13,6 +17,7 @@
   border:1px solid var(--rule);
   border-radius:var(--r-2);
   box-shadow:var(--glass-shadow);
+  --spec:0;--mx:30%;--my:0%;
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
   .lens{
@@ -31,8 +36,11 @@
   /* specular sheen: a soft diagonal highlight, like light across a curved surface */
   .lens::before{
     content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
-    background:var(--glass-sheen);
+    background:
+      radial-gradient(circle 190px at var(--mx) var(--my), color-mix(in oklch, var(--glass-spec) calc(var(--spec) * 100%), transparent) 0, transparent 100%),
+      var(--glass-sheen);
     mix-blend-mode:screen;
+    transition:--spec .32s var(--ease);
   }
   /* edge light: brighter rim fading round the shape */
   .lens::after{
